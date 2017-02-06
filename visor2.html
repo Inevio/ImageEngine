@@ -1,0 +1,259 @@
+<html>
+  <head>
+    <style>
+    body{
+      margin: 0 !important;
+    }
+
+    #general{
+      width: 100%;
+      height: 100%;
+      background: blue;
+    }
+
+    #visor{
+      background-color: red;
+      width: 765px;
+      height: 510px;
+    }
+
+    #mostrar{
+      background: black;
+      position : relative;
+
+    }
+    </style>
+
+    <script>
+      var cols = 3;
+      var fil = 2;
+
+
+      var urls = [];
+      var img = [];
+      var indices = [];
+      var numero_actual = 0;
+
+      //var cursor_x;
+      //var cursor_y;
+
+      var derecha;
+      var izquierda;
+      var up;
+      var down;
+
+      var tam_view_x = 800; // Tamaño de la cámara
+      var tam_view_y = 1200; // Tamaño de la cámara
+
+      var tam_x_img;
+      var tam_y_img;
+
+      var tam_destino_x;
+      var tam_destino_y;
+      //var cuadros; // Cuadros máximos para cargar la ampliación
+/*
+      var sx = 0;
+      var sy = 0;
+      var sw;
+      var sh;*/
+
+      var dx;
+      var dy;
+      var dw;
+      var dh;
+      /*
+      grande = new Image();
+      grande.src = "cat/big.jpg";*/
+      function divide (){
+        tam_X = (reduc.width)/cols;
+        tam_Y = (reduc.height)/fil;}
+
+      /* Calcular el numero de cols y filas que son necesarias
+      para cargar la imagen */
+      function maximo (){
+        max_carga_ancho = Math.ceil(tam_view_x / tam_x_img);
+        max_carga_alto  = Math.ceil(tam_view_y / tam_y_img);
+
+        tam_destino_x = cols * tam_x_img;
+        tam_destino_y = fil * tam_y_img;
+
+
+        //relacion_x = tam_destino_x / reduc.width;
+        //relacion_y = tam_destino_y / reduc.height;
+      }
+
+      /*Genera un "tabla" con las url de las imágenes en las
+      que se descompone la imagen, el orden es de izquierda
+      a derecha y de arriba a abajo */
+      function tabla (){
+        divide();
+        //aux = new Array(cols);
+        for ( j = 0; j < cols*fil; j++)
+          urls[j] = "cat/" + j + ".jpg";
+          //console.log(aux[j]);
+        }
+
+        /* Función general de llamada */
+        function fun (event){
+          indices = [];
+          getMouseLocationX(event); // Coordenadas en el canvas del ratón en x
+          getMouseLocationY(event); // Coordenadas en el canvas del ratón en y
+          position();               // Calcula en qué cuadrante del canvas se encuentra
+          calcular_vecinos();       // Calcula las imágenes necesarias para ampliar la zona y las carga
+          display();              // Dibujar la imagen final
+        }
+
+        /*Devuelve la coordenada X del ratón */
+        function getMouseLocationX(event) {
+          var coordenadas = visor.getBoundingClientRect();
+          cursor_x = event.pageX - coordenadas.left;
+        }
+
+
+        /* Devuelve la coordenada Y del ratón */
+        function getMouseLocationY(event){
+          var coordenadas = visor.getBoundingClientRect();
+          cursor_y = event.pageY - coordenadas.top;
+        }
+
+        /* Calcular posición actual */
+        function position (){
+          numero_actual = (parseInt(cursor_x / tam_X ) + parseInt(cursor_y / tam_Y ) * cols);
+          //console.log(numero_actual, cursor_x,tam_X,cursor_y,tam_Y,parseInt(cursor_x / tam_X ) ,parseInt(cursor_y / tam_Y ));
+
+          if ( numero_actual >= cols * fil ){
+            numero_actual = 0;
+            cursor_x = 0;
+            cursor_y = 0;
+            console.log("Error al seleccionar cuadro");
+          }
+        }
+
+        function calcular_vecinos(){
+          /* Lio  de paréntesis */ /* Solucionado */
+          derecha   = parseInt ((cursor_x + ((max_carga_ancho/2) * tam_X))/ tam_X) + parseInt(cursor_y / tam_Y ) * cols;
+          izquierda = parseInt ((cursor_x - ((max_carga_ancho/2) * tam_X))/ tam_X) + parseInt(cursor_y / tam_Y ) * cols ;
+
+          up   = parseInt (cursor_x / tam_X ) + parseInt((cursor_y - ((max_carga_alto/2) * tam_Y)) / tam_Y ) * cols;
+          down = parseInt (cursor_x / tam_X ) + parseInt((cursor_y + ((max_carga_alto/2) * tam_Y)) / tam_Y ) * cols;
+
+          /* Solucionar: No siempre hay que entrar en el bucle */ /* Solucionado */
+          /* Solucionar: Problemas si derecha o izquierda no está en la primera fila */
+          /* Solucionar: Las imágemes diagonales */
+          while((((derecha % cols * tam_X) > reduc.width) || ((derecha % cols) <= (numero_actual % cols))) && (derecha != numero_actual))
+            derecha -= 1;
+
+          while (((izquierda < 0) || ((izquierda % cols) >= (numero_actual % cols))) && (izquierda != numero_actual))
+            izquierda += 1;
+
+          while ((down >= urls.length) && (down != numero_actual))
+            down -= cols;
+
+          while ((up  < 0) && (up != numero_actual))
+            up += cols;
+
+          //Carga de imágenes
+          for ( i = 0; i < urls.length; i++){
+            if ((izquierda % cols <= i % cols) && ((derecha % cols) >= (i % cols)) && ( i >= (up - (numero_actual - izquierda))) && ( i <= (down + (derecha - numero_actual)))){
+              indices[indices.length] = i;
+              if (img[i] == undefined){
+                img[i] = new Image();
+                img[i].src = urls[i];
+              }
+            }
+          }
+        }       /* Fin function */
+
+        function display(){
+          var c = document.getElementById("muestra");
+          var ctx = c.getContext("2d");
+
+          c.width = tam_view_x;
+          c.height = tam_view_y;
+
+          relacion_x = (cols * tam_x_img) / (cols * tam_X);
+          relacion_y = (fil * tam_y_img) / (fil * tam_Y);
+
+          desplazamiento_x =  (0.5 * tam_view_x) - cursor_x*relacion_x ;
+          desplazamiento_y = (0.5 * tam_view_y) - cursor_y*relacion_y ;
+
+          console.log("-------------------------");
+          indices.forEach(function(item){
+            //img[indice].onload = function(){
+            //console.log(indices);
+              dx = (((item % cols ) * tam_X  ) * relacion_x ) + desplazamiento_x;
+              dy = ((((item - (item % cols )) / cols ) * tam_Y ) * relacion_y) + desplazamiento_y;
+              console.log(item, dx, dy, cursor_x, cursor_y);
+            //  img[item].onload=function(){
+              ctx.drawImage(img[item],dx,dy,tam_x_img,tam_y_img);
+            //}
+          })
+        }
+
+    </script>
+  </head>
+  <body>
+    <div id = "general">
+      <canvas id = "visor" onmousemove="fun(event)">
+        Su navegador no soporta canvas
+      </canvas>
+
+      <script>
+      /* onmousemove es el evento bueno, onclick solo
+      está puesto para debuggear */
+        var c = document.getElementById("visor");
+        var ctx=c.getContext("2d");
+
+        var reduc = new Image();
+        reduc.src = "cat/reduc.jpg";
+
+
+
+        /* ATENCION!!! no puedes acceder al tamañoI
+        de la imagen si no la has cargado antes, te
+        daría error al cargarlo por primera vez */
+
+        reduc.onload = function(){
+          c.width = reduc.width;
+          c.height = reduc.height;
+          tabla();
+          ctx.drawImage(reduc,0,0);
+          for (var i = 0; i < fil*cols; i++){
+            img[i] = undefined;
+          }
+          img[0] = new Image();
+          img[0].src = urls[0];
+
+          img[0].onload = function(){
+            tam_x_img = img[0].width;
+            tam_y_img = img[0].height;
+            maximo();
+          }
+
+
+        /* Definir los cuadros */
+        ctx.moveTo(tam_X,0);
+        ctx.lineTo(tam_X, tam_Y*fil);
+
+        ctx.moveTo(tam_X*2, 0);
+        ctx.lineTo(tam_X*2, tam_Y*fil);
+
+        ctx.moveTo(tam_X*3, 0);
+        ctx.lineTo(tam_X*3, tam_Y*fil);
+
+        ctx.moveTo(0, tam_Y);
+        ctx.lineTo(tam_X*cols, tam_Y);
+
+        ctx.stroke();
+      }
+
+      </script>
+
+      <canvas id = "muestra">
+        Su navegador no soporta canvas
+      </canvas>
+
+
+    </div>
+  </body>
+</html>
