@@ -1,0 +1,105 @@
+<html>
+  <head>
+    <html>
+  <head>
+    <style>
+    body{
+      margin: 0 !important;
+    }
+
+    #general{
+      width: 100%;
+      height: 50%;
+      background: blue;
+    }
+
+    #visor{
+      background-color: red;
+
+      cursor: n-resize;
+      cursor: -webkit-zoom-in;
+      cursor: -moz-zoom-in;
+    }
+
+    #mostrar{
+      background: black;
+      position : relative;
+
+    }
+    </style>
+    <script type="text/javascript" src="programs.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <div id = "general">
+      <canvas id = "visor" onmousemove="mousemove(event)">
+        Su navegador no soporta canvas
+      </canvas>
+
+      <script>
+
+      /* onmousemove es el evento bueno, onclick solo
+      está puesto para debuggear */
+        var c = document.getElementById("visor");
+        var ctx=c.getContext("2d");
+
+        var reduc = new Image();
+        reduc.src = "mariposa/reduc.jpeg";
+
+
+
+        /* ATENCION!!! no puedes acceder al tamañoI
+        de la imagen si no la has cargado antes, te
+        daría error al cargarlo por primera vez */
+
+        reduc.onload = function(){
+          c.width = reduc.width;
+          c.height = reduc.height;
+          tabla();
+          Scroll();
+          ctx.drawImage(reduc,0,0);
+          for (var i = 0; i < fil*cols; i++){
+            img[i] = undefined;
+          }
+          img[0] = new Image();
+          img[0].src = urls[0];
+
+          img[0].onload = function(){
+            tam_x_img = img[0].width;
+            tam_y_img = img[0].height;
+            maximo();
+          }
+
+        /* Definir los cuadros */
+
+        for (k = 0; k < cols; k++){
+          ctx.moveTo(tam_X*k,0);
+          ctx.lineTo(tam_X*k, tam_Y*fil);
+        }
+
+        for (i = 0; i < fil; i++){
+          ctx.moveTo(0, i*tam_Y);
+          ctx.lineTo(tam_X*cols, tam_Y*i);
+        }
+
+        ctx.stroke();
+
+      }
+
+      </script>
+
+      <canvas id = "muestra">
+        Su navegador no soporta canvas
+      </canvas>
+      <script>
+        var d = document.getElementById("muestra");
+        //var dctx = d.getContext("2d");
+
+        d.width = tam_view_x;
+        d.height = tam_view_y;
+      </script>
+
+
+    </div>
+  </body>
+</html>
