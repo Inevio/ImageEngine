@@ -28,7 +28,6 @@
     }
     </style>
     <script type="text/javascript" src="programs.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
   </head>
   <body>
     <div id = "general">
@@ -60,15 +59,18 @@
           ctx.drawImage(reduc,0,0);
           for (var i = 0; i < fil*cols; i++){
             img[i] = undefined;
-          }
+          }/*
           img[0] = new Image();
           img[0].src = urls[0];
 
           img[0].onload = function(){
             tam_x_img = img[0].width;
-            tam_y_img = img[0].height;
-            maximo();
-          }
+            tam_y_img = img[0].height;*/
+          tam_x_img = tam_X;
+          tam_y_img = tam_X;
+          maximo();
+          //}
+
 
         /* Definir los cuadros */
 
@@ -83,8 +85,9 @@
         }
 
         ctx.stroke();
-
       }
+
+
 
       </script>
 
