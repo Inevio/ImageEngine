@@ -42,10 +42,13 @@
      var dh;
      /*
      grande = new Image();
-     grande.src = "cat/big.jpg";*/
+     grande.src = "mariposa/big.jpeg";*/
      function divide (){
        size_x = (reduc.width)/column;
        size_y = (reduc.height)/row;
+
+       size_view_x = size_x * column;
+       size_view_y = size_y * row;
 
        size_x_false = size_x*2;
        size_y_false = size_y*2;
@@ -56,8 +59,8 @@
      /* Calcular el numero de column y filas que son necesarias
      para cargar la imagen */
      function maximum (){
-       max_carga_ancho = Math.ceil(canvas_destination_x / size_x_img)+1;
-       max_carga_alto  = Math.ceil(canvas_destination_y / size_y_img)+1;
+       max_carga_ancho = column;
+       max_carga_alto  = row;
        if (size_x_img < canvas_destination_x)
         max_carga_ancho = column + 1;
        if (size_y_img < canvas_destination_y)
@@ -78,8 +81,8 @@
        /* Función general de llamada */
        function mousemove (event){
          index = [];
-         getMouseLocationX(event); // Coordenadas en el canvas del ratón en x
-         getMouseLocationY(event); // Coordenadas en el canvas del ratón en y
+         getMouseLomariposaionX(event); // Coordenadas en el canvas del ratón en x
+         getMouseLomariposaionY(event); // Coordenadas en el canvas del ratón en y
          election()
        }
        function election (){
@@ -95,14 +98,14 @@
        }
 
        /*Devuelve la coordenada X del ratón */
-       function getMouseLocationX(event) {
+       function getMouseLomariposaionX(event) {
          var coordenadas = visor.getBoundingClientRect();
          cursor_x = event.pageX - coordenadas.left;
        }
 
 
        /* Devuelve la coordenada Y del ratón */
-       function getMouseLocationY(event){
+       function getMouseLomariposaionY(event){
          var coordenadas = visor.getBoundingClientRect();
          cursor_y = event.pageY - coordenadas.top;
        }
@@ -119,26 +122,32 @@
 
        function calculate_neighbour(){
          /* Lio  de paréntesis */ /* Solucionado */
-         right   = parseInt ((cursor_x + ((max_carga_ancho/2) * size_x))/ size_x) + parseInt(cursor_y / size_y ) * column;
+         right   = parseInt (((cursor_x + ((max_carga_ancho/2) * size_x))/ size_x)+1) + parseInt(cursor_y / size_y ) * column;
          left = parseInt ((cursor_x - ((max_carga_ancho/2) * size_x))/ size_x) + parseInt(cursor_y / size_y ) * column ;
 
          up   = parseInt (cursor_x / size_x ) + parseInt((cursor_y - ((max_carga_alto/2) * size_y)) / size_y ) * column;
-         down = parseInt (cursor_x / size_x ) + parseInt((cursor_y + ((max_carga_alto/2) * size_y)) / size_y ) * column;
+         down = parseInt (cursor_x / size_x ) + parseInt(((cursor_y + ((max_carga_alto/2) * size_y)) / size_y )+1) * column;
 
          /* Solucionar: No siempre hay que entrar en el bucle */ /* Solucionado */
          /* Solucionar: Problemas si right o left no está en la primera fila */
          /* Solucionar: Las imágemes diagonales */
+         console.log(where_you_are);
+         console.log(right);
          while((((right % column * size_x) > reduc.width) || ((right % column) <= (where_you_are % column))) && (right != where_you_are))
            right -= 1;
-
+         console.log(right);
+         console.log(left);
          while (((left < 0) || ((left % column) >= (where_you_are % column))) && (left != where_you_are))
            left += 1;
-
+         console.log(left);
+         console.log(down);
          while ((down >= urls.length) && (down != where_you_are))
            down -= column;
-
+         console.log(down);
+         console.log(up);
          while ((up  < 0) && (up != where_you_are))
            up += column;
+         console.log(up);
 
          //Carga de imágenes
          for ( i = 0; i < urls.length; i++){
@@ -150,10 +159,11 @@
              }
            }
          }
+         console.log(index);
        }       /* Fin function */
 
        function display(){
-         var c = document.getElementById("muestra");
+         var c = document.getElementById("visor");
          var ctx = c.getContext("2d");
 
          relacion_x = size_x_img / size_x;
@@ -164,7 +174,7 @@
 
 
          ctx.fillStyle = "#FFFFFF";
-         ctx.fillRect(0,0,canvas_destination_x + 100, canvas_destination_y + 100);
+         ctx.fillRect(0,0,size_x * column, size_y * row);
 
          index.forEach(function(item){
              dx = (((item % column ) * size_x  ) * relacion_x ) + desplazamiento_x;
@@ -213,7 +223,7 @@
 
       function displayEasy(){
         //console.log("easy");
-        var c = document.getElementById("muestra");
+        var c = document.getElementById("visor");
         var ctx = c.getContext("2d");
 
         var reduc = new Image();
@@ -230,13 +240,8 @@
         desplazamiento_y =  -cursor_y * proporcion_easy_y + (0.5 * canvas_destination_y) ;
         //console.log(desplazamiento_x, desplazamiento_y);
         ctx.fillStyle = "#FFFFFF";
-        ctx.fillRect(0,0,canvas_destination_x+200,canvas_destination_y+200);/*
-        ctx.fillStyle = "#FF0000";
-        ctx.beginPath();
-        ctx.arc(desplazamiento_x, desplazamiento_y, 4, 0, 3.1415*4);
-        ctx.stroke();
-        ctx.closePath();*/
-        //dx = (((item % column ) * size_x  ) * relacion_x ) + desplazamiento_x;
-        //dy = ((((item - (item % column )) / column ) * size_y ) * relacion_y) + desplazamiento_y;
+        ctx.fillRect(0,0,size_x * column, size_y * row);
+
         ctx.drawImage(reduc, desplazamiento_x, desplazamiento_y, size_x_false*column, size_y_false*row);
+        console.log("easy");
       }
