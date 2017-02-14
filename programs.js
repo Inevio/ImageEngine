@@ -14,6 +14,8 @@
      var up;
      var down;
 
+     var flag = false;
+
      var size_view_x = 250; // Tamaño de la cámara
      var size_view_y = 250; // Tamaño de la cámara
 
@@ -75,18 +77,20 @@
        //aux = new Array(column);
       for ( j = 0; j < column*row; j++)
         urls[j] = "mariposa/" + j + ".jpeg";
-         //console.log(aux[j]);
        }
 
        /* Función general de llamada */
+       function mousepress(){
+         flag = !flag;
+       }
        function mousemove (event){
+         if(flag){
          index = [];
          getMouseLomariposaionX(event); // Coordenadas en el canvas del ratón en x
          getMouseLomariposaionY(event); // Coordenadas en el canvas del ratón en y
-         election()
+         election();}
        }
        function election (){
-         //console.log(proportion_easy_x);
          if (depth){
            position();               // Calcula en qué cuadrante del canvas se encuentra
            calculate_neighbour();       // Calcula las imágenes necesarias para ampliar la zona y las carga
@@ -131,23 +135,19 @@
          /* Solucionar: No siempre hay que entrar en el bucle */ /* Solucionado */
          /* Solucionar: Problemas si right o left no está en la primera fila */
          /* Solucionar: Las imágemes diagonales */
-         console.log(where_you_are);
-         console.log(right);
+
          while((((right % column * size_x) > reduc.width) || ((right % column) <= (where_you_are % column))) && (right != where_you_are))
            right -= 1;
-         console.log(right);
-         console.log(left);
+
          while (((left < 0) || ((left % column) >= (where_you_are % column))) && (left != where_you_are))
            left += 1;
-         console.log(left);
-         console.log(down);
+
          while ((down >= urls.length) && (down != where_you_are))
            down -= column;
-         console.log(down);
-         console.log(up);
+
          while ((up  < 0) && (up != where_you_are))
            up += column;
-         console.log(up);
+
 
          //Carga de imágenes
          for ( i = 0; i < urls.length; i++){
@@ -159,7 +159,6 @@
              }
            }
          }
-         console.log(index);
        }       /* Fin function */
 
        function display(){
@@ -222,7 +221,6 @@
       }
 
       function displayEasy(){
-        //console.log("easy");
         var c = document.getElementById("visor");
         var ctx = c.getContext("2d");
 
@@ -238,10 +236,8 @@
 
         desplazamiento_x =  -cursor_x * proportion_easy_x + (0.5 * canvas_destination_x);
         desplazamiento_y =  -cursor_y * proporcion_easy_y + (0.5 * canvas_destination_y) ;
-        //console.log(desplazamiento_x, desplazamiento_y);
         ctx.fillStyle = "#FFFFFF";
         ctx.fillRect(0,0,size_x * column, size_y * row);
 
-        ctx.drawImage(reduc, desplazamiento_x, desplazamiento_y, size_x_false*column, size_y_false*row);
-        console.log("easy");
+        ctx.drawImage(reduc, cursor_x-size_x_false*column/2, cursor_y-size_y_false*row/2, size_x_false*column, size_y_false*row);
       }
