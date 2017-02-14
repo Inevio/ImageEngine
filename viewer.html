@@ -54,37 +54,16 @@
         reduc.onload = function(){
           c.width = reduc.width;
           c.height = reduc.height;
-          tabla();
+          table();
           Scroll();
           ctx.drawImage(reduc,0,0);
-          for (var i = 0; i < fil*cols; i++){
+          for (var i = 0; i < row*column; i++){
             img[i] = undefined;
-          }/*
-          img[0] = new Image();
-          img[0].src = urls[0];
+          }
+          size_x_img = size_x;
+          size_y_img = size_x;
+          maximum();
 
-          img[0].onload = function(){
-            tam_x_img = img[0].width;
-            tam_y_img = img[0].height;*/
-          tam_x_img = tam_X;
-          tam_y_img = tam_X;
-          maximo();
-          //}
-
-
-        /* Definir los cuadros */
-
-        for (k = 0; k < cols; k++){
-          ctx.moveTo(tam_X*k,0);
-          ctx.lineTo(tam_X*k, tam_Y*fil);
-        }
-
-        for (i = 0; i < fil; i++){
-          ctx.moveTo(0, i*tam_Y);
-          ctx.lineTo(tam_X*cols, tam_Y*i);
-        }
-
-        ctx.stroke();
       }
 
 
@@ -92,14 +71,11 @@
       </script>
 
       <canvas id = "muestra">
-        Su navegador no soporta canvas
+
       </canvas>
       <script>
-        var d = document.getElementById("muestra");
-        //var dctx = d.getContext("2d");
 
-        d.width = tam_view_x;
-        d.height = tam_view_y;
+
       </script>
 
 

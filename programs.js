@@ -1,41 +1,41 @@
-     var cols = 6;
-     var fil = 4;
+     var column = 6;
+     var row = 4;
      var k = 0;
      var urls = [];
      var img = [];
-     var indices = [];
-     var numero_actual = 0;
+     var index = [];
+     var where_you_are = 0;
 
      //var cursor_x;
      //var cursor_y;
 
-     var derecha;
-     var izquierda;
+     var right;
+     var left;
      var up;
      var down;
 
-     var tam_view_x = 250; // Tamaño de la cámara
-     var tam_view_y = 250; // Tamaño de la cámara
+     var size_view_x = 250; // Tamaño de la cámara
+     var size_view_y = 250; // Tamaño de la cámara
 
-     var canvas_destino_x = tam_view_x;
-     var canvas_destino_y = tam_view_y;
+     var canvas_destination_x = size_view_x;
+     var canvas_destination_y = size_view_y;
 
-     //var proporcion = canvas_destino_x/canvas_destino_y;
+     //var proporcion = canvas_destination_x/canvas_destination_y;
 
-     var tam_x_img;
-     var tam_y_img;
+     var size_x_img;
+     var size_y_img;
 
-     var tam_x_false;
-     var tam_y_false;
+     var size_x_false;
+     var size_y_false;
 
-     var profundidad = false;
+     var depth = false;
      //var cuadros; // Cuadros máximos para cargar la ampliación
 /*
      var sx = 0;
      var sy = 0;
      var sw;
      var sh;*/
-     var proporcion_easy_x;
+     var proportion_easy_x;
      var dx;
      var dy;
      var dw;
@@ -44,49 +44,49 @@
      grande = new Image();
      grande.src = "cat/big.jpg";*/
      function divide (){
-       tam_X = (reduc.width)/cols;
-       tam_Y = (reduc.height)/fil;
+       size_x = (reduc.width)/column;
+       size_y = (reduc.height)/row;
 
-       tam_x_false = tam_X*2;
-       tam_y_false = tam_Y*2;
+       size_x_false = size_x*2;
+       size_y_false = size_y*2;
 
-       proporcion_easy_x = tam_x_false / tam_X;
+       proportion_easy_x = size_x_false / size_x;
      }
 
-     /* Calcular el numero de cols y filas que son necesarias
+     /* Calcular el numero de column y filas que son necesarias
      para cargar la imagen */
-     function maximo (){
-       max_carga_ancho = Math.ceil(canvas_destino_x / tam_x_img)+1;
-       max_carga_alto  = Math.ceil(canvas_destino_y / tam_y_img)+1;
-       if (tam_x_img < canvas_destino_x)
-        max_carga_ancho = cols + 1;
-       if (tam_y_img < canvas_destino_y)
-        max_carga_alto = fil + 1;
+     function maximum (){
+       max_carga_ancho = Math.ceil(canvas_destination_x / size_x_img)+1;
+       max_carga_alto  = Math.ceil(canvas_destination_y / size_y_img)+1;
+       if (size_x_img < canvas_destination_x)
+        max_carga_ancho = column + 1;
+       if (size_y_img < canvas_destination_y)
+        max_carga_alto = row + 1;
      }
 
-     /*Genera un "tabla" con las url de las imágenes en las
-     que se descompone la imagen, el orden es de izquierda
-     a derecha y de arriba a abajo */
-     function tabla (){
+     /*Genera un "table" con las url de las imágenes en las
+     que se descompone la imagen, el orden es de left
+     a right y de arriba a abajo */
+     function table (){
        divide();
-       //aux = new Array(cols);
-      for ( j = 0; j < cols*fil; j++)
+       //aux = new Array(column);
+      for ( j = 0; j < column*row; j++)
         urls[j] = "mariposa/" + j + ".jpeg";
          //console.log(aux[j]);
        }
 
        /* Función general de llamada */
        function mousemove (event){
-         indices = [];
+         index = [];
          getMouseLocationX(event); // Coordenadas en el canvas del ratón en x
          getMouseLocationY(event); // Coordenadas en el canvas del ratón en y
-         eleccion()
+         election()
        }
-       function eleccion (){
-         //console.log(proporcion_easy_x);
-         if (profundidad){
+       function election (){
+         //console.log(proportion_easy_x);
+         if (depth){
            position();               // Calcula en qué cuadrante del canvas se encuentra
-           calcular_vecinos();       // Calcula las imágenes necesarias para ampliar la zona y las carga
+           calculate_neighbour();       // Calcula las imágenes necesarias para ampliar la zona y las carga
            display();                // Dibujar la imagen final
         }
         else {
@@ -109,70 +109,67 @@
 
        /* Calcular posición actual */
        function position (){
-         numero_actual = (parseInt(cursor_x / tam_X ) + parseInt(cursor_y / tam_Y ) * cols);
-         proporcion_easy_x = tam_x_false / tam_X;
-         if (proporcion_easy_x < 1){
-           profundidad = false;
-           eleccion();
+         where_you_are = (parseInt(cursor_x / size_x ) + parseInt(cursor_y / size_y ) * column);
+         proportion_easy_x = size_x_false / size_x;
+         if (proportion_easy_x < 1){
+           depth = false;
+           election();
            return;}
        }
 
-       function calcular_vecinos(){
+       function calculate_neighbour(){
          /* Lio  de paréntesis */ /* Solucionado */
-         derecha   = parseInt ((cursor_x + ((max_carga_ancho/2) * tam_X))/ tam_X) + parseInt(cursor_y / tam_Y ) * cols;
-         izquierda = parseInt ((cursor_x - ((max_carga_ancho/2) * tam_X))/ tam_X) + parseInt(cursor_y / tam_Y ) * cols ;
+         right   = parseInt ((cursor_x + ((max_carga_ancho/2) * size_x))/ size_x) + parseInt(cursor_y / size_y ) * column;
+         left = parseInt ((cursor_x - ((max_carga_ancho/2) * size_x))/ size_x) + parseInt(cursor_y / size_y ) * column ;
 
-         up   = parseInt (cursor_x / tam_X ) + parseInt((cursor_y - ((max_carga_alto/2) * tam_Y)) / tam_Y ) * cols;
-         down = parseInt (cursor_x / tam_X ) + parseInt((cursor_y + ((max_carga_alto/2) * tam_Y)) / tam_Y ) * cols;
+         up   = parseInt (cursor_x / size_x ) + parseInt((cursor_y - ((max_carga_alto/2) * size_y)) / size_y ) * column;
+         down = parseInt (cursor_x / size_x ) + parseInt((cursor_y + ((max_carga_alto/2) * size_y)) / size_y ) * column;
 
          /* Solucionar: No siempre hay que entrar en el bucle */ /* Solucionado */
-         /* Solucionar: Problemas si derecha o izquierda no está en la primera fila */
+         /* Solucionar: Problemas si right o left no está en la primera fila */
          /* Solucionar: Las imágemes diagonales */
-         while((((derecha % cols * tam_X) > reduc.width) || ((derecha % cols) <= (numero_actual % cols))) && (derecha != numero_actual))
-           derecha -= 1;
+         while((((right % column * size_x) > reduc.width) || ((right % column) <= (where_you_are % column))) && (right != where_you_are))
+           right -= 1;
 
-         while (((izquierda < 0) || ((izquierda % cols) >= (numero_actual % cols))) && (izquierda != numero_actual))
-           izquierda += 1;
+         while (((left < 0) || ((left % column) >= (where_you_are % column))) && (left != where_you_are))
+           left += 1;
 
-         while ((down >= urls.length) && (down != numero_actual))
-           down -= cols;
+         while ((down >= urls.length) && (down != where_you_are))
+           down -= column;
 
-         while ((up  < 0) && (up != numero_actual))
-           up += cols;
+         while ((up  < 0) && (up != where_you_are))
+           up += column;
 
          //Carga de imágenes
          for ( i = 0; i < urls.length; i++){
-           if ((izquierda % cols <= i % cols) && ((derecha % cols) >= (i % cols)) && ( i >= (up - (numero_actual - izquierda))) && ( i <= (down + (derecha - numero_actual)))){
-             indices[indices.length] = i;
+           if ((left % column <= i % column) && ((right % column) >= (i % column)) && ( i >= (up - (where_you_are - left))) && ( i <= (down + (right - where_you_are)))){
+             index[index.length] = i;
              if (img[i] == undefined){
                img[i] = new Image();
                img[i].src = urls[i];
              }
            }
          }
-         //console.log(indices);
        }       /* Fin function */
 
        function display(){
          var c = document.getElementById("muestra");
          var ctx = c.getContext("2d");
-         //console.log("-----------------------");
-         //console.log("pedacitos");
 
-         relacion_x = tam_x_img / tam_X;
-         relacion_y = tam_y_img / tam_Y;
+         relacion_x = size_x_img / size_x;
+         relacion_y = size_y_img / size_y;
 
-         desplazamiento_x = (0.5 * canvas_destino_x) - cursor_x * relacion_x;
-         desplazamiento_y = (0.5 * canvas_destino_y) - cursor_y * relacion_y;
+         desplazamiento_x = (0.5 * canvas_destination_x) - cursor_x * relacion_x;
+         desplazamiento_y = (0.5 * canvas_destination_y) - cursor_y * relacion_y;
 
 
          ctx.fillStyle = "#FFFFFF";
-         ctx.fillRect(0,0,canvas_destino_x,canvas_destino_y);
+         ctx.fillRect(0,0,canvas_destination_x + 100, canvas_destination_y + 100);
 
-         indices.forEach(function(item){
-             dx = (((item % cols ) * tam_X  ) * relacion_x ) + desplazamiento_x;
-             dy = ((((item - (item % cols )) / cols ) * tam_Y ) * relacion_y) + desplazamiento_y;
-             ctx.drawImage(img[item],dx,dy,tam_x_img,tam_y_img);
+         index.forEach(function(item){
+             dx = (((item % column ) * size_x  ) * relacion_x ) + desplazamiento_x;
+             dy = ((((item - (item % column )) / column ) * size_y ) * relacion_y) + desplazamiento_y;
+             ctx.drawImage(img[item],dx,dy,size_x_img,size_y_img);
 
          })
        }
@@ -180,20 +177,20 @@
 //var contador = 3;
        function zoom(alpha){
          //if (alpha > 0  || contador > minimo){
-           indices=[];
+           index=[];
            //var beta = 50;
-         //tam_view_x -= alpha * 100;
-         //tam_view_y -= alpha * 100 * proporcion;
-         tam_x_false += alpha * 50 * tam_x_img/tam_y_img;
-         tam_y_false += alpha * 50;
+         //size_view_x -= alpha * 100;
+         //size_view_y -= alpha * 100 * proporcion;
+         size_x_false += alpha * 50 * size_x_img/size_y_img;
+         size_y_false += alpha * 50;
 
-         tam_x_img = tam_x_false;
-         tam_y_img = tam_y_false;
+         size_x_img = size_x_false;
+         size_y_img = size_y_false;
 
          //contador += alpha;
        //}
-         maximo();
-         eleccion();
+         maximum();
+         election();
        }
 
       function Scroll(){
@@ -222,24 +219,24 @@
         var reduc = new Image();
         reduc.src = "mariposa/reduc.jpeg";
 
-        proporcion_easy_x = tam_x_false / tam_X;
-        if (proporcion_easy_x > 1){
-          profundidad = true;
-          eleccion();
+        proportion_easy_x = size_x_false / size_x;
+        if (proportion_easy_x > 1){
+          depth = true;
+          election();
           return;}
-        var proporcion_easy_y = tam_y_false / tam_Y;
+        var proporcion_easy_y = size_y_false / size_y;
 
-        desplazamiento_x =  -cursor_x * proporcion_easy_x + (0.5 * canvas_destino_x);
-        desplazamiento_y =  -cursor_y * proporcion_easy_y + (0.5 * canvas_destino_y) ;
+        desplazamiento_x =  -cursor_x * proportion_easy_x + (0.5 * canvas_destination_x);
+        desplazamiento_y =  -cursor_y * proporcion_easy_y + (0.5 * canvas_destination_y) ;
         //console.log(desplazamiento_x, desplazamiento_y);
         ctx.fillStyle = "#FFFFFF";
-        ctx.fillRect(0,0,canvas_destino_x,canvas_destino_y);/*
+        ctx.fillRect(0,0,canvas_destination_x+200,canvas_destination_y+200);/*
         ctx.fillStyle = "#FF0000";
         ctx.beginPath();
         ctx.arc(desplazamiento_x, desplazamiento_y, 4, 0, 3.1415*4);
         ctx.stroke();
         ctx.closePath();*/
-        //dx = (((item % cols ) * tam_X  ) * relacion_x ) + desplazamiento_x;
-        //dy = ((((item - (item % cols )) / cols ) * tam_Y ) * relacion_y) + desplazamiento_y;
-        ctx.drawImage(reduc, desplazamiento_x, desplazamiento_y, tam_x_false*cols, tam_y_false*fil);
+        //dx = (((item % column ) * size_x  ) * relacion_x ) + desplazamiento_x;
+        //dy = ((((item - (item % column )) / column ) * size_y ) * relacion_y) + desplazamiento_y;
+        ctx.drawImage(reduc, desplazamiento_x, desplazamiento_y, size_x_false*column, size_y_false*row);
       }
