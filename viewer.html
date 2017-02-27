@@ -16,9 +16,7 @@
     #visor{
       background-color: red;
 
-      cursor: n-resize;
-      cursor: -webkit-zoom-in;
-      cursor: -moz-zoom-in;
+
     }
 
     #mostrar{
@@ -31,14 +29,12 @@
   </head>
   <body>
     <div id = "general">
-      <canvas id = "visor" onmousemove="mousemove(event)" onmousedown="mousepress()" onmouseup="mousepress()">
-        Su navegador no soporta canvas
+      <canvas id = "visor" onmousemove="mousemove(event)" onmousedown="mousepress(event)"
+       onmouseup="mousepress(event)" onmouseout="problem()">
       </canvas>
 
       <script>
 
-      /* onmousemove es el evento bueno, onclick solo
-      está puesto para debuggear */
         var c = document.getElementById("visor");
         var ctx=c.getContext("2d");
 
@@ -52,19 +48,34 @@
         daría error al cargarlo por primera vez */
 
         reduc.onload = function(){
-          c.width = reduc.width;
-          c.height = reduc.height;
+          c.width = reduc.width/2;
+          console.log(c.width);
+          c.height = reduc.height/2;
           table();
           Scroll();
-          ctx.drawImage(reduc,0,0);
+          ctx.drawImage(reduc,0,0, reduc.width/2, reduc.height/2);
           for (var i = 0; i < row*column; i++){
             img[i] = undefined;
           }
           size_x_img = size_x;
           size_y_img = size_x;
           maximum();
-
+          canvas_destination_x = c.width;
+          canvas_destination_y = c.height;
+          //celdas();
       }
+/*
+      function celdas(){
+      ctx.beginPath();
+      algo = reduc.height / 4
+      for( var w = 0; w < 6; w++){
+        ctx.moveTo(0,w*algo);
+        ctx.lineTo(canvas_destination_x*2,w*algo);
+        ctx.stroke();
+    }
+
+      ctx.closePath();
+    }*/
 
 
 
