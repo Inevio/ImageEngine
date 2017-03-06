@@ -45,20 +45,24 @@ var desplazamiento_y;
 
 function first(){
   point_x = canvas_destination_x/2;
-  ////console.log(point_x);
   point_y = canvas_destination_y/2;
-  ////console.log(point_y);
+  ////console.log("First: ", point_x, point_y);
+
   last_mouse[0] = point_x;
   last_mouse[1] = point_y;
+  ////console.log("First last_mouse: ", last_mouse)
+
+  last_point[0] = point_x;
+  last_point[1] = point_y;
 
   desplazamiento_x = (0.5 * canvas_destination_x) - point_x * relacion_x ;
   desplazamiento_y = (0.5 * canvas_destination_y) - point_y * relacion_y ;
-
+  ////console.log("Desplazamiento: ", desplazamiento_x, desplazamiento_y );
   position();
   calculate_neighbour();
   display();
   one = false;
-  //console.log(move_x);
+  //////console.log(move_x);
 }
 
 function save(){
@@ -71,13 +75,14 @@ function save(){
 
 function rest(){
   move_x = cursor_x - last_mouse[0];
+  ////console.log("Rest :", cursor_x, last_mouse[0])
   move_y = cursor_y - last_mouse[1];
+  ////console.log("Rest :", cursor_y, last_mouse[1])
   if (move_x > 10 || move_x < -10)
     move_x=move_x%10;
   if (move_y > 10 || move_y < -10)
     move_y=move_y%10;
-
-  //console.log(move_x);
+  ////console.log("Rest: ", move_x, move_y);
   }
 
 function divide (){
@@ -114,24 +119,48 @@ function table (){
   function getMouseLocationX(event) {
     var coordenadas = visor.getBoundingClientRect();
     cursor_x = event.pageX - coordenadas.left;
+    ////console.log("Mouse X: ", cursor_x);
   }
 
   function getMouseLocationY(event){
     var coordenadas = visor.getBoundingClientRect();
     cursor_y = event.pageY - coordenadas.top;
+    ////console.log("Mouse Y: ", cursor_y);
   }
-
-  function invento(){
-    point_x += last_mouse[0] - cursor_x;
-    point_y += last_mouse[0] - cursor_y;
+/*
+  function calculate_coord(){
+    coordenadas[0] = cursor_x - desplazamiento_x;
+    coordenadas[1] = cursor_y - desplazamiento_y;
   }
-
+  function update_coord(alpha){
+    coordenadas[0] += alpha * 10 * size_x_img/size_y_img + despla;
+    coordenadas[1] += alpha * 10;
+  }*/
   function zoom(alpha){
+
+    //calculate_coord();
+    size_x_false += alpha * 10 * size_x_img/size_y_img;
+    size_y_false += alpha * 10;
+    //update_coord(alpha);
+
     point_x = cursor_x;
     point_y = cursor_y;
+
     index=[];
-    size_x_false += alpha * 20 * size_x_img/size_y_img;
-    size_y_false += alpha * 20;
+
+    relacion_x = size_x_img / size_x;
+    relacion_y = size_y_img / size_y;
+
+    if(alpha){
+      desplazamiento_x = desplazamiento_x*size_x_false/size_x_img;
+      desplazamiento_y = desplazamiento_y*size_y_false/size_y_img;
+    }
+    else{
+      desplazamiento_x = desplazamiento_x*size_x_false/size_x_img - move_x*size_x_false/size_x_img;
+      desplazamiento_y = desplazamiento_y*size_y_false/size_y_img - move_y*size_y_false/size_y_img;
+    }
+
+    save();
 
     size_x_img = size_x_false;
     size_y_img = size_y_false;
@@ -163,20 +192,56 @@ function table (){
    var c = document.getElementById("visor");
    var ctx = c.getContext("2d");
 
-   var reduc = new Image();
-   reduc.src = "mariposa/reduc.jpeg";
-
+   proportion_easy_x = size_x_false / size_x;
+   //console.log("Soy easy y fallo :D")
    if (proportion_easy_x > 1){
      depth = true;
      election();
      return;}
 
-   var proporcion_easy_y = size_y_false / size_y;
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(0,0,size_x * column, size_y * row);
 
-   ctx.fillStyle = "#FFFFFF";
-   ctx.fillRect(0,0,size_x * column, size_y * row);
 
-   ctx.drawImage(reduc, point_x-size_x_false*column/2, point_y-size_y_false*row/2);
+   //console.log("Especial: ",size_x_false*column, canvas_destination_x);
+   if(size_x_false*column < canvas_destination_x){
+    ctx.drawImage(reduc, canvas_destination_x/2-size_x_false*column/2, canvas_destination_y/2-size_y_false*row/2, size_x_false*column, size_y_false*row);
+    //console.log("SOY ESPECIAL :D")
+    }
+   else {
+     rest();
+     update();
+     desplazamiento_x += move_x;
+     desplazamiento_y += move_y;
+     save();
+     ////console.log("Desplazamientos: ", desplazamiento_x, desplazamiento_y);
+     if (desplazamiento_x > 0){
+        desplazamiento_x = 0;
+        point_x = last_point[0];
+        //console.log("Limit left");
+      }
+
+    if(desplazamiento_y > 0){
+      desplazamiento_y = 0;
+      point_y = last_point[1];
+      //console.log("Limit top");
+    }
+
+    //console.log("Limit right :", size_x_false*column, desplazamiento_x, size_x_false*column + desplazamiento_x, canvas_destination_x);
+    if ( size_x_false*column + desplazamiento_x < canvas_destination_x){
+      point_x = last_point[0];
+      desplazamiento_x -= move_x;
+      //console.log("Limit right");
+    }
+
+    //console.log("Limit bot :", size_y_false*row, desplazamiento_y,size_y_false*row + desplazamiento_y, canvas_destination_y);
+    if ( size_y_false*row + desplazamiento_y < canvas_destination_y){
+      point_y = last_point[1];
+      desplazamiento_y -= move_y;
+      //console.log("Limit bot");
+    }
+     ctx.drawImage(reduc, desplazamiento_x, desplazamiento_y, size_x_false*column, size_y_false*row)
+  }
  }
 
  function mousepress(event){
@@ -186,14 +251,10 @@ function table (){
 
    last_mouse_x = cursor_x;
    last_mouse_y = cursor_y;
-   //console.log("BYE!!  " + move_x );
   }
    if(!flag){
      getMouseLocationX(event);
      getMouseLocationY(event);
-     // console.log("-----------------------------------------------------")
-     //console.log("CLICK!!!");
-     //console.log(move_x);
      last_mouse_x = cursor_x;
      last_mouse_y = cursor_y;
    }
@@ -240,6 +301,7 @@ function table (){
    for ( i = 0; i < urls.length; i++){
      if ((left % column <= i % column) && ((right % column) >= (i % column)) && ( i >= (up - (where_you_are - left))) && ( i <= (down + (right - where_you_are)))){
        index[index.length] = i;
+       //////console.log("Index: ",index[index.length-1]);
        if (img[i] == undefined){
          img[i] = new Image();
          img[i].src = urls[i];
@@ -256,19 +318,27 @@ function table (){
    if (((index[0] % column ) * size_x  ) + desplazamiento_x > 0){
       desplazamiento_x = 0;
       point_x = last_point[0];
+      ////console.log("Limit left");
     }
 
   if(((((index[0] - (index[0] % column )) / column ) * size_y ) * relacion_y) + desplazamiento_y > 0){
     desplazamiento_y = 0;
     point_y = last_point[1];
-  }/*
-  console.log(row, size_x, desplazamiento_x,(row * size_x + desplazamiento_x ), canvas_destination_x, size_x == size_x_img)
-  if ((row * size_x_img + desplazamiento_x ) < (canvas_destination_x)){
-    //desplazamiento_x += +canvas_destination_x - (row * size_x_img + desplazamiento_x );
-    point_x = last_point[0];
-    console.log("jejeje");*/
+    ////console.log("Limit top");
   }
 
+  if ( size_x_img*column + desplazamiento_x < canvas_destination_x){
+    point_x = last_point[0];
+    desplazamiento_x -= move_x;
+    ////console.log("Limit right");
+  }
+
+  if ( size_y_img*row + desplazamiento_y < canvas_destination_y){
+    point_y = last_point[1];
+    desplazamiento_y -= move_y;
+    ////console.log("Limit bot");
+  }
+  //////console.log(point_x, point_y, move_x, move_y, desplazamiento_x, desplazamiento_y, last_point)
  }
 
  function display(){
@@ -281,6 +351,7 @@ function table (){
    index.forEach(function(item){
        dx = (((item % column ) * size_x  ) * relacion_x ) + desplazamiento_x;
        dy = ((((item - (item % column )) / column ) * size_y ) * relacion_y) + desplazamiento_y;
+       //////console.log("Display: ", dx, dy);
        ctx.drawImage(img[item],dx,dy,size_x_img,size_y_img);
    })
  }
@@ -290,9 +361,9 @@ function table (){
      index = [];
      getMouseLocationX(event);
      getMouseLocationY(event);
-     rest();
-     update();
+
      election();
+     ////console.log("Mousemove ~")
    }
  }
 
@@ -302,22 +373,17 @@ function table (){
       first();
 
      else{
-       //rest();
-       //console.log("move:" + move_x + "  " + move_y);
-       //update();
-       //console.log("desplazado:" + point_x + "  " + point_y);
+       rest();
+       update();
        position();
        calculate_neighbour();
        calculate_display();
        display();
        save();
-       /*
-       if(move_x > 5 || move_y > 5 || move_y < -5 || move_x < -5)
-        console.log("ERRORRRRRRRRRRRRRRRRRRRRRRRRRRRRR")*/
      }
   }
   else {
-    calculate_display();
+    //calculate_display();
     displayEasy();
   }
  }
